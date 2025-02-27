@@ -6,6 +6,7 @@
 #ifndef _KOCOMPOSITEOP_GENERIC_H_
 #define _KOCOMPOSITEOP_GENERIC_H_
 
+#include "KoCompositeOpFunctions.h"
 #include "KoCompositeOpBase.h"
 #include "KoCompositeOpGenericFunctorBase.h"
 
@@ -42,7 +43,7 @@ struct CompositeFunctionWrapperHSL : KoCompositeOpGenericFunctorBase<typename Tr
 
 /**
  * Generic CompositeOp for separable channel compositing functions
- * 
+ *
  * A template to generate a KoCompositeOp class by just specifying a
  * blending/compositing function. This template works with compositing functions
  * for separable channels (means each channel of a pixel can be processed separately)
@@ -56,10 +57,10 @@ class KoCompositeOpGenericSCFunctor: public KoCompositeOpBase< Traits, KoComposi
 {
     typedef KoCompositeOpBase< Traits, KoCompositeOpGenericSCFunctor<Traits,CompositeOpFunctor,BlendingPolicy> > base_class;
     typedef typename Traits::channels_type                                            channels_type;
-    
+
     static const qint32 channels_nb = Traits::channels_nb;
     static const qint32 alpha_pos   = Traits::alpha_pos;
-    
+
 public:
     KoCompositeOpGenericSCFunctor(const KoColorSpace* cs, const QString& id, const QString& category)
         : base_class(cs, id, category) { }
@@ -70,7 +71,7 @@ public:
                                                      channels_type*       dst, channels_type dstAlpha, channels_type maskAlpha,
                                                      channels_type opacity, const QBitArray& channelFlags) {
         using namespace Arithmetic;
-        
+
         srcAlpha = mul(srcAlpha, maskAlpha, opacity);
 
         if (isZeroValueFuzzy(srcAlpha)) {
@@ -97,7 +98,7 @@ public:
                     }
                 }
             }
-            
+
             return dstAlpha;
         } else if (isZeroValueFuzzy(dstAlpha)) {
             for(qint32 i=0; i <channels_nb; i++) {
@@ -171,7 +172,7 @@ public:
                     }
                 }
             }
-            
+
             return newDstAlpha;
         }
     }
@@ -192,7 +193,7 @@ public:
 
 /**
  * Generic CompositeOp for nonseparable/HSL channel compositing functions
- * 
+ *
  * A template to generate a KoCompositeOp class by just specifying a
  * blending/compositing function. This template works with compositing functions
  * for RGB channels only (the channels can not be processed separately)
@@ -202,15 +203,15 @@ class KoCompositeOpGenericHSLFunctor: public KoCompositeOpBase< Traits, KoCompos
 {
     typedef KoCompositeOpBase< Traits, KoCompositeOpGenericHSLFunctor<Traits,CompositeOpFunctor>> base_class;
     typedef typename Traits::channels_type channels_type;
-    
+
     static const qint32 red_pos   = Traits::red_pos;
     static const qint32 green_pos = Traits::green_pos;
     static const qint32 blue_pos  = Traits::blue_pos;
-    
+
 public:
     KoCompositeOpGenericHSLFunctor(const KoColorSpace* cs, const QString& id, const QString& category)
         : base_class(cs, id, category) { }
-    
+
 public:
     template<bool alphaLocked, bool allChannelFlags>
     inline static channels_type composeColorChannels(const channels_type* src, channels_type srcAlpha,
@@ -349,6 +350,141 @@ public:
 
             return newDstAlpha;
         }
+    }
+};
+
+template<class Traits, void compositeFunc(float, float, float, float, float&, float&, float&)>
+class KoCompositeOpGenericOVER: public KoCompositeOpBase< Traits, KoCompositeOpGenericOVER<Traits,compositeFunc> >
+{
+    typedef KoCompositeOpBase< Traits, KoCompositeOpGenericOVER<Traits,compositeFunc> > base_class;
+    typedef typename Traits::channels_type                                             channels_type;
+
+    static const qint32 red_pos   = Traits::red_pos;
+    static const qint32 green_pos = Traits::green_pos;
+    static const qint32 blue_pos  = Traits::blue_pos;
+
+public:
+    KoCompositeOpGenericOVER(const KoColorSpace* cs, const QString& id, const QString& category)
+        : base_class(cs, id, category) { }
+
+public:
+    template<bool alphaLocked, bool allChannelFlags>
+    inline static channels_type composeColorChannels(const channels_type* src, channels_type srcAlpha,
+                                                     channels_type*       dst, channels_type dstAlpha, channels_type maskAlpha,
+                                                     channels_type opacity, const QBitArray& channelFlags) {
+        using namespace Arithmetic;
+        srcAlpha = mul(srcAlpha, maskAlpha, opacity);
+
+        if(srcAlpha == zeroValue<channels_type>()) return dstAlpha;
+
+        channels_type newDstAlpha = (alphaLocked) ? dstAlpha : unionShapeOpacity(srcAlpha, dstAlpha);
+
+        if(dstAlpha == zeroValue<channels_type>()) {
+            if(allChannelFlags || channelFlags.testBit(red_pos))
+                dst[red_pos] = src[red_pos];
+
+            if(allChannelFlags || channelFlags.testBit(green_pos))
+                dst[green_pos] = src[green_pos];
+
+            if(allChannelFlags || channelFlags.testBit(blue_pos))
+                dst[blue_pos] = src[blue_pos];
+        } else {
+            const float factor = float(srcAlpha) / newDstAlpha;
+
+            float srcR = scale<float>(src[red_pos]);
+            float srcG = scale<float>(src[green_pos]);
+            float srcB = scale<float>(src[blue_pos]);
+
+            float dstR = scale<float>(dst[red_pos]);
+            float dstG = scale<float>(dst[green_pos]);
+            float dstB = scale<float>(dst[blue_pos]);
+
+            compositeFunc(srcR, srcG, srcB, 1.0f - factor, dstR, dstG, dstB);
+
+            if(allChannelFlags || channelFlags.testBit(red_pos))
+                dst[red_pos] = scale<channels_type>(dstR);
+
+            if(allChannelFlags || channelFlags.testBit(green_pos))
+                dst[green_pos] = scale<channels_type>(dstG);
+
+            if(allChannelFlags || channelFlags.testBit(blue_pos))
+                dst[blue_pos] = scale<channels_type>(dstB);
+        }
+
+        return newDstAlpha;
+    }
+};
+
+
+
+
+
+
+template<class Traits, void compositeFunc(float, float, float, float, float&, float&, float&)>
+class KoCompositeOpGenericCOPY: public KoCompositeOpBase< Traits, KoCompositeOpGenericCOPY<Traits,compositeFunc> >
+{
+    typedef KoCompositeOpBase< Traits, KoCompositeOpGenericCOPY<Traits,compositeFunc> > base_class;
+    typedef typename Traits::channels_type                                             channels_type;
+
+    static const qint32 red_pos   = Traits::red_pos;
+    static const qint32 green_pos = Traits::green_pos;
+    static const qint32 blue_pos  = Traits::blue_pos;
+
+public:
+    KoCompositeOpGenericCOPY(const KoColorSpace* cs, const QString& id, const QString& category)
+        : base_class(cs, id, category) { }
+
+public:
+    template<bool alphaLocked, bool allChannelFlags>
+    inline static channels_type composeColorChannels(const channels_type* src, channels_type srcAlpha,
+                                                     channels_type*       dst, channels_type dstAlpha, channels_type maskAlpha,
+                                                     channels_type opacity, const QBitArray& channelFlags) {
+        using namespace Arithmetic;
+        opacity = mul(maskAlpha, opacity);
+
+        if (opacity == zeroValue<channels_type>()) return dstAlpha;
+
+        channels_type newDstAlpha = (alphaLocked) ? dstAlpha : lerp(dstAlpha, srcAlpha, opacity);
+
+        if (srcAlpha == zeroValue<channels_type>()) return newDstAlpha;
+
+        if (dstAlpha == zeroValue<channels_type>()) {
+            if(allChannelFlags || channelFlags.testBit(red_pos))
+                dst[red_pos] = src[red_pos];
+
+            if(allChannelFlags || channelFlags.testBit(green_pos))
+                dst[green_pos] = src[green_pos];
+
+            if(allChannelFlags || channelFlags.testBit(blue_pos))
+                dst[blue_pos] = src[blue_pos];
+        } else {
+            /**
+             * TODO: think about premultiplying the color channels before
+             *       starting the blend (most probably, we don't need that,
+             *       but who knows)
+             */
+
+            float srcR = scale<float>(src[red_pos]);
+            float srcG = scale<float>(src[green_pos]);
+            float srcB = scale<float>(src[blue_pos]);
+
+            float dstR = scale<float>(dst[red_pos]);
+            float dstG = scale<float>(dst[green_pos]);
+            float dstB = scale<float>(dst[blue_pos]);
+
+            compositeFunc(srcR, srcG, srcB, 1.0f - opacity, dstR, dstG, dstB);
+
+            if(allChannelFlags || channelFlags.testBit(red_pos))
+                dst[red_pos] = scale<channels_type>(dstR);
+
+            if(allChannelFlags || channelFlags.testBit(green_pos))
+                dst[green_pos] = scale<channels_type>(dstG);
+
+            if(allChannelFlags || channelFlags.testBit(blue_pos))
+                dst[blue_pos] = scale<channels_type>(dstB);
+        }
+
+        return newDstAlpha;
     }
 };
 

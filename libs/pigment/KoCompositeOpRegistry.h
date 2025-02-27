@@ -59,6 +59,7 @@ const QString COMPOSITE_DIVISIVE_MOD_CON   = "divisive_modulo_continuous";
 const QString COMPOSITE_MODULO_SHIFT       = "modulo_shift";
 const QString COMPOSITE_MODULO_SHIFT_CON   = "modulo_shift_continuous";
 
+const QString COMPOSITE_OVER_SPECTRAL = "spectral";
 const QString COMPOSITE_EQUIVALENCE   = "equivalence";
 const QString COMPOSITE_ALLANON       = "allanon";
 const QString COMPOSITE_PARALLEL      = "parallel";
@@ -156,6 +157,7 @@ const QString COMPOSITE_COPY         = "copy";
 const QString COMPOSITE_COPY_RED     = "copy_red";
 const QString COMPOSITE_COPY_GREEN   = "copy_green";
 const QString COMPOSITE_COPY_BLUE    = "copy_blue";
+const QString COMPOSITE_COPY_SPECTRAL        = "copy spectral";
 const QString COMPOSITE_TANGENT_NORMALMAP    = "tangent_normalmap";
 
 const QString COMPOSITE_COLORIZE     = "colorize";

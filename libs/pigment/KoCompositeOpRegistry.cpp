@@ -47,7 +47,7 @@ KoCompositeOpRegistry::KoCompositeOpRegistry()
     m_map.insert(m_categories[0], KoID(COMPOSITE_MULT            ,  i18nc("Blending mode - Multiply", "Multiply")));
     m_map.insert(m_categories[0], KoID(COMPOSITE_DIVIDE          ,  i18nc("Blending mode - Divide", "Divide")));
     m_map.insert(m_categories[0], KoID(COMPOSITE_INVERSE_SUBTRACT,  i18nc("Blending mode - Inverse Subtract", "Inverse Subtract")));
-    
+
     m_map.insert(m_categories[1], KoID(COMPOSITE_XOR             ,  i18nc("Blending mode - XOR", "XOR")));
     m_map.insert(m_categories[1], KoID(COMPOSITE_OR              ,  i18nc("Blending mode - OR", "OR")));
     m_map.insert(m_categories[1], KoID(COMPOSITE_AND             ,  i18nc("Blending mode - AND", "AND")));
@@ -109,6 +109,7 @@ KoCompositeOpRegistry::KoCompositeOpRegistry()
     m_map.insert(m_categories[5], KoID(COMPOSITE_NEGATION             ,  i18nc("Blending mode - Negation", "Negation")));
 
     m_map.insert(m_categories[6], koidCompositeOverStatic());
+    m_map.insert(m_categories[6], KoID(COMPOSITE_OVER_SPECTRAL        ,  i18nc("Blending mode - Spectral", "Spectral")));
     m_map.insert(m_categories[6], KoID(COMPOSITE_BEHIND          ,  i18nc("Blending mode - Behind", "Behind")));
     m_map.insert(m_categories[6], KoID(COMPOSITE_GREATER         ,  i18nc("Blending mode - Greater", "Greater")));
     m_map.insert(m_categories[6], KoID(COMPOSITE_OVERLAY         ,  i18nc("Blending mode - Overlay", "Overlay")));
@@ -143,6 +144,7 @@ KoCompositeOpRegistry::KoCompositeOpRegistry()
     m_map.insert(m_categories[7], KoID(COMPOSITE_COPY_GREEN,  i18nc("Blending mode - Copy Green", "Copy Green")));
     m_map.insert(m_categories[7], KoID(COMPOSITE_COPY_BLUE ,  i18nc("Blending mode - Copy Blue", "Copy Blue")));
     m_map.insert(m_categories[7], KoID(COMPOSITE_COPY      ,  i18nc("Blending mode - Copy", "Copy")));
+    m_map.insert(m_categories[7], KoID(COMPOSITE_COPY_SPECTRAL,  i18nc("Blending mode - Copy Spectral", "Copy Spectral")));
     m_map.insert(m_categories[7], KoID(COMPOSITE_TANGENT_NORMALMAP,  i18nc("Blending mode - Tangent Normalmap", "Tangent Normalmap")));
 
     m_map.insert(m_categories[8], KoID(COMPOSITE_COLOR         ,  i18nc("Blending mode - Color HSY", "Color")));
@@ -181,7 +183,7 @@ KoCompositeOpRegistry::KoCompositeOpRegistry()
     m_map.insert(m_categories[11], KoID(COMPOSITE_INC_SATURATION_HSV,  i18nc("Blending mode - Increase Saturation HSV", "Increase Saturation HSV")));
     m_map.insert(m_categories[11], KoID(COMPOSITE_DEC_VALUE         ,  i18nc("Blending mode - Decrease Value HSV", "Decrease Value")));
     m_map.insert(m_categories[11], KoID(COMPOSITE_INC_VALUE         ,  i18nc("Blending mode - Increase Value HSV", "Increase Value")));
-    
+
     m_map.insert(m_categories[12], KoID(COMPOSITE_REFLECT          ,  i18nc("Blending mode - Reflect", "Reflect")));
     m_map.insert(m_categories[12], KoID(COMPOSITE_GLOW             ,  i18nc("Blending mode - Glow", "Glow")));
     m_map.insert(m_categories[12], KoID(COMPOSITE_FREEZE           ,  i18nc("Blending mode - Freeze", "Freeze")));
