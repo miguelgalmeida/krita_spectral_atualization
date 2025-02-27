@@ -3,6 +3,7 @@
 | CI Name     | Master | Stable | Release |
 | ------------------- | ---------------- | ------ | ------- |
 | Pipeline | [![pipeline status](https://invent.kde.org/graphics/krita/badges/master/pipeline.svg)](https://invent.kde.org/graphics/krita/-/commits/master) | [![pipeline status](https://invent.kde.org/graphics/krita/badges/krita/5.2/pipeline.svg)](https://invent.kde.org/graphics/krita/-/commits/krita/5.2) | [![Latest Release](https://invent.kde.org/graphics/krita/-/badges/release.svg)](https://invent.kde.org/graphics/krita/-/releases) |
+
 Disclaimer: This is just an implementation from [Ronald van Wijnen](https://github.com/rvanwijnen) [Spectral.js](https://github.com/rvanwijnen/spectral.jshttps://github.com/rvanwijnen/spectral.js) for Krita 5.3.0 Build, I do not know how to program in C++ but have study C# enough to do this, for now i'ts just a copy from [Spectral Krita make by Ronald](https://invent.kde.org/rvanwijnen/krita/-/tree/spectral_blend).
 
 Disclaimer: I made these because build the old version on Linux was impossible due the actualizations on the process and new bugs, for now I will try to learn how to code C++ to help the complete implementation of Spectral on Krita.
